@@ -71,8 +71,15 @@ const formatter = (type = 'info', message = '', options = {}) => {
     style === 'markdown' && (message = message.replace(/\n/g, ' \n\n > ').replace(/ +/g, ' '))
   }
 
+  // 提取账号信息用于标题
+  let title = `签到${type === 'info' ? '成功 🎉' : '失败 💣'}`
+  const accountMatch = message.match(/^账号(\d+)/)
+  if (accountMatch) {
+    title = `账号${accountMatch[1]} 签到${type === 'info' ? '成功 🎉' : '失败 💣'}`
+  }
+
   return {
-    title: `签到${type === 'info' ? '成功 🎉' : '失败 💣'}`,
+    title,
     content: style === 'html' ? `<pre>${message}</pre>` : message,
   }
 }

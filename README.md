@@ -58,3 +58,33 @@
 * [nodemon](https://github.com/remy/nodemon)
 * [axios](https://github.com/axios/axios)
 * [nodemailer](https://github.com/nodemailer/nodemailer)
+
+## 环境变量配置
+
+### 单账号配置（向后兼容）
+```
+COOKIE=your_cookie_here
+```
+
+### 多账号配置（新功能）
+```
+# 使用逗号分隔多个cookie
+COOKIES=cookie1,cookie2,cookie3
+
+# 或者使用分号分隔
+COOKIES=cookie1;cookie2;cookie3
+```
+
+**注意：**
+- 如果同时配置了 `COOKIE` 和 `COOKIES`，程序会优先使用 `COOKIES`
+- 多账号模式下，每个账号会依次进行签到，并单独发送邮件通知
+- 账号之间会有2秒的延迟，避免请求过于频繁
+
+### 其他环境变量
+```
+EMAIL=your_email@example.com
+AUTHORIZATION_CODE=your_authorization_code
+PUSHPLUS_TOKEN=your_pushplus_token
+DINGDING_WEBHOOK=your_dingding_webhook
+FEISHU_WEBHOOK=your_feishu_webhook
+```
