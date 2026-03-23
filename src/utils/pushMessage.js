@@ -2,45 +2,33 @@ const email = require('./email.js')
 const pushplus = require('./pushplus.js')
 const dingding = require('./dingding.js')
 const feishu = require('./feishu.js')
-const { EMAIL, AUTHORIZATION_CODE, PUSHPLUS_TOKEN, DINGDING_WEBHOOK, FEISHU_WEBHOOK } = require('../ENV.js')
+const { getDefaultPushConfig } = require('../ENV.js')
 
-const pushMessage = ({ type, message }) => {
+const pushMessage = ({ type, message, titlePrefix = '' }, config = getDefaultPushConfig()) => {
   console.log(message)
 
-  EMAIL &&
-    AUTHORIZATION_CODE &&
-    email(
-      formatter(type, message, {
-        style: 'html',
-        bold: true,
-      })
-    )
+  const formattedTitlePrefix = titlePrefix ? `${titlePrefix} ` : ''
+  const payloadForEmail = formatter(type, message, {
+    style: 'html',
+    bold: true,
+    titlePrefix: formattedTitlePrefix,
+  })
+  const payloadForMarkdown = formatter(type, message, {
+    style: 'markdown',
+    bold: true,
+    wordWrap: true,
+    titlePrefix: formattedTitlePrefix,
+  })
+  const payloadForFeishu = formatter(type, message, {
+    style: 'markdown',
+    bold: true,
+    titlePrefix: formattedTitlePrefix,
+  })
 
-  PUSHPLUS_TOKEN &&
-    pushplus(
-      formatter(type, message, {
-        style: 'markdown',
-        bold: true,
-        wordWrap: true,
-      })
-    )
-
-  DINGDING_WEBHOOK &&
-    dingding(
-      formatter(type, message, {
-        style: 'markdown',
-        bold: true,
-        wordWrap: true,
-      })
-    )
-
-  FEISHU_WEBHOOK &&
-    feishu(
-      formatter(type, message, {
-        style: 'markdown',
-        bold: true,
-      })
-    )
+  config.email && config.authorizationCode && email(payloadForEmail, config)
+  config.pushplusToken && pushplus(payloadForMarkdown, config)
+  config.dingdingWebhook && dingding(payloadForMarkdown, config)
+  config.feishuWebhook && feishu(payloadForFeishu, config)
 }
 
 /**
@@ -52,6 +40,7 @@ const pushMessage = ({ type, message }) => {
  *   style: String 风格
  *   bold: Boolean 是否数字加粗
  *   wordWrap: Boolean 是否换行
+ *   titlePrefix: String 标题前缀
  * }
  * @returns {Object}
  * {
@@ -60,7 +49,7 @@ const pushMessage = ({ type, message }) => {
  * }
  */
 const formatter = (type = 'info', message = '', options = {}) => {
-  const { style = 'html', bold = false, wordWrap = false } = options
+  const { style = 'html', bold = false, wordWrap = false, titlePrefix = '' } = options
 
   if (bold && type === 'info') {
     style === 'html' && (message = message.replace(/\+?\d+/g, ' <b>$&</b> '))
@@ -72,7 +61,7 @@ const formatter = (type = 'info', message = '', options = {}) => {
   }
 
   return {
-    title: `签到${type === 'info' ? '成功 🎉' : '失败 💣'}`,
+    title: `${titlePrefix}签到${type === 'info' ? '成功 🎉' : '失败 💣'}`.trim(),
     content: style === 'html' ? `<pre>${message}</pre>` : message,
   }
 }

@@ -1,14 +1,19 @@
 const nodemailer = require('nodemailer')
-const { EMAIL, AUTHORIZATION_CODE } = require('../ENV.js')
 
-const email = async ({ title = '', content = '' } = {}) => {
+const email = async ({ title = '', content = '' } = {}, config = {}) => {
+  const { email: receiverEmail = '', authorizationCode = '' } = config
+
+  if (!receiverEmail || !authorizationCode) {
+    return
+  }
+
   try {
-    const suffix = /@(?<suffix>.*)/.exec(EMAIL).groups.suffix
+    const suffix = /@(?<suffix>.*)/.exec(receiverEmail).groups.suffix
     const options = {
       host: `smtp.${suffix}`,
       auth: {
-        user: EMAIL,
-        pass: AUTHORIZATION_CODE,
+        user: receiverEmail,
+        pass: authorizationCode,
       },
     }
     const transporter = nodemailer.createTransport(options)
@@ -16,8 +21,8 @@ const email = async ({ title = '', content = '' } = {}) => {
     await transporter.verify()
 
     return transporter.sendMail({
-      from: `稀土掘金助手 <${EMAIL}>`,
-      to: EMAIL,
+      from: `稀土掘金助手 <${receiverEmail}>`,
+      to: receiverEmail,
       subject: title,
       html: content,
     })

@@ -19,6 +19,7 @@ jobs:
       - name: Depend install and serve
         env:
           COOKIE: ${{ secrets.COOKIE }}
+          ACCOUNTS: ${{ secrets.ACCOUNTS }}
           EMAIL: ${{ secrets.EMAIL }}
           AUTHORIZATION_CODE: ${{ secrets.AUTHORIZATION_CODE }}
           PUSHPLUS_TOKEN: ${{ secrets.PUSHPLUS_TOKEN }}

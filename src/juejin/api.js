@@ -1,7 +1,8 @@
-const http = require('./httpInstance.js')
+const createHttpInstance = require('./httpInstance.js')
+
 class Api {
   constructor() {
-    this.http = http
+    this.http = createHttpInstance()
   }
 
   /**
@@ -32,7 +33,7 @@ class Api {
    * }
    */
   checkIn() {
-    return this.http.post(`/growth_api/v1/check_in?aid=`)
+    return this.http.post('/growth_api/v1/check_in?aid=')
   }
 
   /**
@@ -55,7 +56,7 @@ class Api {
    * }
    */
   getLotteryConfig() {
-    return this.http.get(`/growth_api/v1/lottery_config/get?aid=`)
+    return this.http.get('/growth_api/v1/lottery_config/get?aid=')
   }
 
   /**
